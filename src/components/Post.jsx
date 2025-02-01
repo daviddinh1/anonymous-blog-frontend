@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Createcomment from "./Createcomment";
 
 const Post = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  //get data using useEffect hook
+
+  // Fetch the post data using useEffect
   useEffect(() => {
     fetch("http://localhost:3000/posts")
       .then((response) => {
@@ -24,18 +26,39 @@ const Post = () => {
       });
   }, []);
 
-  //output data to see what it looks like as a .json
+  // Callback to update the post's comments
+  const handleCommentAdded = (newComment) => {
+    setData((prevData) => ({
+      ...prevData,
+      // Assume the post data contains an array called "comments"
+      comments: prevData.comments
+        ? [...prevData.comments, newComment]
+        : [newComment],
+    }));
+  };
+
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div>
       <ul>
-        <li>postId: {data.id}</li>
-        <li>userId: {data.userId}</li>
-        <li>createdAt: {data.createdAt}</li>
         <li>body: {data.body}</li>
-        <li>comments: {data.comment}</li>
+        <li>
+          Comments:
+          {data.comments && data.comments.length > 0 ? (
+            <ul>
+              {data.comments.map((comment) => (
+                <li key={comment.id}>{comment.text}</li>
+              ))}
+            </ul>
+          ) : (
+            " No comments yet."
+          )}
+        </li>
       </ul>
+      {/* Pass the postId and the callback to Createcomment */}
+      <Createcomment postId={data.id} onCommentAdded={handleCommentAdded} />
     </div>
   );
 };
