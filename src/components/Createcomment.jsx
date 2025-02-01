@@ -33,12 +33,8 @@ function Createcomment({ postId, onCommentAdded }) {
       console.log("Response from server:", responseData);
       if (response.ok) {
         alert("Comment created");
-        // Call the callback to update the post with the new comment
         onCommentAdded(responseData);
-        // Optionally, clear the comment input
         setComment({ text: "" });
-        // Optionally, navigate if desired
-        // navigate("/posts");
       } else {
         alert("There was an issue sending your comment");
       }

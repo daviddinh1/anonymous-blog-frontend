@@ -6,16 +6,17 @@ const Post = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch the post data using useEffect
+  // Fetch the post data, which includes comments, using useEffect.
   useEffect(() => {
     fetch("http://localhost:3000/posts")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("network response is not working");
+          throw new Error("Network response is not working");
         }
         return response.json();
       })
       .then((jsonData) => {
+        console.log("Fetched post data:", jsonData);
         setData(jsonData);
         setLoading(false);
       })
@@ -26,11 +27,12 @@ const Post = () => {
       });
   }, []);
 
-  // Callback to update the post's comments
+  // Callback to update the post's comments when a new comment is added.
   const handleCommentAdded = (newComment) => {
+    console.log("New comment received:", newComment);
     setData((prevData) => ({
       ...prevData,
-      // Assume the post data contains an array called "comments"
+      // Ensure that comments is treated as an array.
       comments: prevData.comments
         ? [...prevData.comments, newComment]
         : [newComment],
@@ -39,24 +41,22 @@ const Post = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
-
   return (
     <div>
-      <ul>
-        <li>body: {data.body}</li>
-        <li>
-          Comments:
-          {data.comments && data.comments.length > 0 ? (
-            <ul>
-              {data.comments.map((comment) => (
-                <li key={comment.id}>{comment.text}</li>
-              ))}
-            </ul>
-          ) : (
-            " No comments yet."
-          )}
-        </li>
-      </ul>
+      <h2>Post</h2>
+      <p>{data.body}</p>
+      <h3>Comments</h3>
+      {data.comment &&
+      Array.isArray(data.comment) &&
+      data.comment.length > 0 ? (
+        <ul>
+          {data.comment.map((comment) => (
+            <li key={comment.id}>{comment.body}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No comments yet.</p>
+      )}
       {/* Pass the postId and the callback to Createcomment */}
       <Createcomment postId={data.id} onCommentAdded={handleCommentAdded} />
     </div>
